@@ -45,27 +45,27 @@ def parseFromDirectory(input_dir, output_dir, file_type='default'):
         print(f"Processing file: {filename}")
         path_file = os.sep.join([input_dir, f"{filename}.pdf"])
         with fitz.open(path_file) as doc:
-            if not filename.endswith('-'):
-                print(f"Modifying file: {filename}")
+            # if not filename.endswith('-'):
+            print(f"Modifying file: {filename}")
+            
+            # Apply each bounding box configuration
+            for box_config in box_configs:
+                pages = box_config["pages"]
+                coords = box_config["coords"]
+                # Convert hex color to RGB tuple
+                color = hex_to_rgb(box_config["color"])
                 
-                # Apply each bounding box configuration
-                for box_config in box_configs:
-                    pages = box_config["pages"]
-                    coords = box_config["coords"]
-                    # Convert hex color to RGB tuple
-                    color = hex_to_rgb(box_config["color"])
-                    
-                    # Handle both single integer and list of page indices
-                    page_indices = [pages] if isinstance(pages, int) else pages
-                    
-                    for page_idx in page_indices:
-                        if 0 <= page_idx < len(doc):
-                            page = doc[page_idx]
-                            rect = fitz.Rect(*coords)
-                            page.draw_rect(rect, color=color, fill=color)
-            else:
-                print(f"Filename ends with '-': {filename}")
-                filename = filename.rstrip('-')
+                # Handle both single integer and list of page indices
+                page_indices = [pages] if isinstance(pages, int) else pages
+                
+                for page_idx in page_indices:
+                    if 0 <= page_idx < len(doc):
+                        page = doc[page_idx]
+                        rect = fitz.Rect(*coords)
+                        page.draw_rect(rect, color=color, fill=color)
+            # else:
+            #     print(f"Filename ends with '-': {filename}")
+            #     filename = filename.rstrip('-')
                 
             output_path = os.sep.join([output_dir, f"{filename}.pdf"])
             doc.save(output_path)
